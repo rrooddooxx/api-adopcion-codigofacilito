@@ -4,7 +4,6 @@ import com.skravetz.apiadopcioncodigofacilito.application.services.PetService;
 import com.skravetz.apiadopcioncodigofacilito.domain.app.Pet;
 import com.skravetz.apiadopcioncodigofacilito.domain.constants.EndpointConstants;
 import com.skravetz.apiadopcioncodigofacilito.domain.dto.CreatePetDto;
-import com.skravetz.apiadopcioncodigofacilito.domain.exceptions.PetNotFoundException;
 import com.skravetz.apiadopcioncodigofacilito.domain.mappers.PetMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,46 +30,27 @@ public class PetsController {
     public ResponseEntity<Long> createPetRegistry(
         @RequestBody CreatePetDto createPetDto
                                                  ) {
-        try {
-            log.info("CREATING NEW PET, WITH PAYLOAD: " + createPetDto);
-            Pet newPet =
-                petService.createNewPet(PetMapper.mapDtoToDomain(createPetDto));
+        log.info("CREATING NEW PET, WITH PAYLOAD: " + createPetDto);
+        Pet newPet =
+            petService.createNewPet(PetMapper.mapDtoToDomain(createPetDto));
 
-            log.info("NEW PET SUCCESSFULLY CREATED!");
-            return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(newPet.getId());
-        } catch (Exception err) {
-            log.error("ERROR CREATING PET: {}", err.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
+        log.info("NEW PET SUCCESSFULLY CREATED!");
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(newPet.getId());
     }
 
     @GetMapping(EndpointConstants.PUBLIC_ROUTE + "/pets")
     public ResponseEntity<List<Pet>> getAllPets() {
-        try {
-            List<Pet> pets = petService.getPets();
-            return ResponseEntity.ok(pets);
-        } catch (Exception err) {
-            log.error("ERROR RETRIEVING PETS: {}", err.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        List<Pet> pets = petService.getPets();
+        return ResponseEntity.ok(pets);
     }
 
     @GetMapping(EndpointConstants.PUBLIC_ROUTE + "/pets/{id}")
     public ResponseEntity<Pet> getPetById(@PathVariable("id") Long id) {
-        try {
-            log.info("LOOKING FOR PET WITH ID: " + id);
-            Pet foundPet = petService.getPetById(id);
-            return ResponseEntity.ok(foundPet);
-        } catch (PetNotFoundException err) {
-            log.error("ERROR RETRIEVING PET WITH ID {}", id);
-            return ResponseEntity.notFound().build();
-        } catch (Exception err) {
-            log.error("ERROR RETRIEVING PET WITH ID {}, MESSAGE: {}", id,
-                      err.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        log.info("LOOKING FOR PET WITH ID: " + id);
+        Pet foundPet = petService.getPetById(id);
+        return ResponseEntity.ok(foundPet);
     }
 
     @PutMapping(EndpointConstants.PRIVATE_ROUTE + "/pets/{id}")
@@ -78,31 +58,15 @@ public class PetsController {
         @PathVariable("id") Long id,
         @RequestBody CreatePetDto createPetDto
                                             ) {
-        try {
-            Pet updatedPet = petService.updatePetById(id,
-                                                      PetMapper.mapUpdateDtoToDomain(id, createPetDto));
-            return ResponseEntity.ok(updatedPet);
-        } catch (PetNotFoundException err) {
-            log.error("ERROR RETRIEVING PET WITH ID {}", id);
-            return ResponseEntity.notFound().build();
-        } catch (Exception err) {
-            log.error("ERROR: {}", err.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        Pet updatedPet = petService.updatePetById(id,
+                                                  PetMapper.mapUpdateDtoToDomain(id, createPetDto));
+        return ResponseEntity.ok(updatedPet);
     }
 
     @DeleteMapping(EndpointConstants.PRIVATE_ROUTE + "/pets/{id}")
     public ResponseEntity<Object> deletePetById(@PathVariable("id") Long id) {
-        try {
-            petService.deletePetById(id);
-            return ResponseEntity.ok().build();
-        } catch (PetNotFoundException err) {
-            log.error("ERROR RETRIEVING PET WITH ID {}", id);
-            return ResponseEntity.notFound().build();
-        } catch (Exception err) {
-            log.error("ERROR: {}", err.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        petService.deletePetById(id);
+        return ResponseEntity.ok().build();
     }
 
 }

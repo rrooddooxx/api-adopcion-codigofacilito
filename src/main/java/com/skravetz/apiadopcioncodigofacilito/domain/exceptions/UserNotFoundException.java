@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 @Slf4j
-public class PetNotFoundException extends RuntimeException {
-    public PetNotFoundException(Long id) {
-        super(String.format("PET WITH ID (%s) NOT FOUND!", id));
-        log.error("PET WITH ID ({}) NOT FOUND!", id);
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message, String username) {
+        super(message);
+        log.error("User ({}) not found: " + message, username);
     }
 
 }

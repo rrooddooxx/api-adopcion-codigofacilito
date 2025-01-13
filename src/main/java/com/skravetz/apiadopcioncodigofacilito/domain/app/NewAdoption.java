@@ -5,15 +5,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
-    private String username;
-    private String password;
-    private Boolean enabled;
-    private String email;
-    private String phone;
+public class NewAdoption {
+    private Long id;
+    private Long petId;
+    private String adopterUsername;
+    private LocalDateTime adoptionDate;
+    private AdoptionStatus adoptionStatus;
 
 }

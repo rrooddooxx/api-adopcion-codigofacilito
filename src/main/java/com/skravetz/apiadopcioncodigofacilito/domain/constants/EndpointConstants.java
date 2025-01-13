@@ -5,3 +5,4 @@ public class EndpointConstants {
     public final static String PRIVATE_ROUTE = "/private";
 
 }
+
