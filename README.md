@@ -16,7 +16,7 @@ solicitudes de adopción.
 - Spring Boot 3.x
 - Spring Security
 - JPA/Hibernate
-- Maven
+- Gradle
 - JUnit 5
 - Mockito
 
