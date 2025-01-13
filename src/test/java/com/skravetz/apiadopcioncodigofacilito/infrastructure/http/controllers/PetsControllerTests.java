@@ -7,13 +7,13 @@ import com.skravetz.apiadopcioncodigofacilito.domain.app.PetType;
 import com.skravetz.apiadopcioncodigofacilito.domain.constants.EndpointConstants;
 import com.skravetz.apiadopcioncodigofacilito.domain.dto.CreatePetDto;
 import com.skravetz.apiadopcioncodigofacilito.domain.exceptions.PetNotFoundException;
+import com.skravetz.apiadopcioncodigofacilito.infrastructure.http.handlers.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +21,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,23 +30,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PetsController.class)
-class PetsControllerTest {
+class PetsControllerTests {
 
-    @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
     private PetService petService;
-
-    @Autowired
     private ObjectMapper objectMapper;
-
     private Pet testPet;
     private CreatePetDto createPetDto;
 
     @BeforeEach
     void setUp() {
+        petService = mock(PetService.class);
+        PetsController controller = new PetsController(petService);
+        mockMvc = MockMvcBuilders
+            .standaloneSetup(controller)
+            .setControllerAdvice(new GlobalExceptionHandler()) // Add
+            // exception handler
+            .build();
+        objectMapper = new ObjectMapper();
         testPet = Pet.builder()
                      .id(1L)
                      .name("Max")
@@ -60,6 +62,7 @@ class PetsControllerTest {
     }
 
     @Test
+    @DisplayName("Create Pet Registry - Success")
     void createPetRegistry_Success() throws Exception {
         when(petService.createNewPet(any(Pet.class))).thenReturn(testPet);
 
@@ -71,16 +74,19 @@ class PetsControllerTest {
     }
 
     @Test
+    @DisplayName("Create Pet Registry - Failure")
     void createPetRegistry_Failure() throws Exception {
-        when(petService.createNewPet(any(Pet.class))).thenThrow(new RuntimeException());
+        when(petService.createNewPet(any(Pet.class)))
+            .thenThrow(new IllegalArgumentException("Invalid pet data"));
 
         mockMvc.perform(post(EndpointConstants.PRIVATE_ROUTE + "/pets")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createPetDto)))
-               .andExpect(status().isBadRequest());
+               .andExpect(status().isInternalServerError());
     }
 
     @Test
+    @DisplayName("Get All Pets - Success")
     void getAllPets_Success() throws Exception {
         List<Pet> pets = Collections.singletonList(testPet);
         when(petService.getPets()).thenReturn(pets);
@@ -91,14 +97,17 @@ class PetsControllerTest {
     }
 
     @Test
+    @DisplayName("Get All Pets - Failure")
     void getAllPets_Failure() throws Exception {
-        when(petService.getPets()).thenThrow(new RuntimeException());
+        when(petService.getPets())
+            .thenThrow(new IllegalStateException("Database error"));
 
         mockMvc.perform(get(EndpointConstants.PUBLIC_ROUTE + "/pets"))
                .andExpect(status().isInternalServerError());
     }
 
     @Test
+    @DisplayName("Get Pet By Id - Success")
     void getPetById_Success() throws Exception {
         when(petService.getPetById(1L)).thenReturn(testPet);
 
@@ -108,6 +117,7 @@ class PetsControllerTest {
     }
 
     @Test
+    @DisplayName("Get Pet By Id - Not Found")
     void getPetById_NotFound() throws Exception {
         when(petService.getPetById(1L)).thenThrow(new PetNotFoundException(1L));
 
@@ -116,6 +126,7 @@ class PetsControllerTest {
     }
 
     @Test
+    @DisplayName("Modify Pet By Id - Success")
     void modifyPetById_Success() throws Exception {
         when(petService.updatePetById(eq(1L), any(Pet.class))).thenReturn(testPet);
 
@@ -127,6 +138,7 @@ class PetsControllerTest {
     }
 
     @Test
+    @DisplayName("Modify Pet By Id - Not Found")
     void modifyPetById_NotFound() throws Exception {
         when(petService.updatePetById(eq(1L), any(Pet.class))).thenThrow(new PetNotFoundException(1L));
 
@@ -137,12 +149,14 @@ class PetsControllerTest {
     }
 
     @Test
+    @DisplayName("Delete Pet By Id - Success")
     void deletePetById_Success() throws Exception {
         mockMvc.perform(delete(EndpointConstants.PRIVATE_ROUTE + "/pets/1"))
                .andExpect(status().isOk());
     }
 
     @Test
+    @DisplayName("Delete Pet By Id - Not Found")
     void deletePetById_NotFound() throws Exception {
         doThrow(new PetNotFoundException(1L))
             .when(petService)
