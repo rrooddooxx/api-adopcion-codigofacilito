@@ -63,6 +63,10 @@ solicitudes de adopción.
 
 - `POST /adoptions` - Crear nueva solicitud de adopción
 
+## Rutas de Spring Actuator
+
+- `GET /actuator/health` - Información sobre la salud de la aplicación
+
 ## 🚀 Ejecutar el Proyecto
 
 1. Clonar el repositorio
