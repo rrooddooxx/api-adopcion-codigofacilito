@@ -82,12 +82,12 @@ solicitudes de adopción.
 
 4. Compilar el proyecto
     ```bash 
-    ./mvnw clean install 
+    ./gradlew build 
     ```
 
 5. Ejecutar la aplicación
     ```bash
-   ./mvnw spring-boot:run
+   ./gradlew bootRun
      ```
 
 ### La API estará disponible en http://localhost:8080
@@ -95,7 +95,7 @@ solicitudes de adopción.
 ## 🧪 Ejecutar Pruebas
 
 ```bash
-./mvnw test
+./gradlew bootTestRun
 ```
 
 ## 👨‍💻 Desarrollador
