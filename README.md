@@ -32,7 +32,8 @@ solicitudes de adopción.
 ## 🔐 Endpoints de la API
 
 > Credenciales para las rutas privadas:
-> user: "api-admin"
+> 
+> user: "api-admin", 
 > pass: "!!4dm1n@api-adopcion"
 
 ### Rutas Públicas (`/api/public`)
