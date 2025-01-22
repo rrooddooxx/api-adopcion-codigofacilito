@@ -7,16 +7,18 @@ import com.skravetz.apiadopcioncodigofacilito.domain.exceptions.UserNotFoundExce
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponseDto> handleGenericException(Exception exception) {
         String errorMessage = exception.getMessage() != null ?
             exception.getMessage() : "Internal server error";
@@ -35,6 +37,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PetNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponseDto> handlePetNotFoundException(PetNotFoundException exception) {
         String message = exception.getMessage() != null ?
             exception.getMessage() : "Pet not found";
@@ -50,6 +53,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponseDto> handleUserNotFoundException(UserNotFoundException exception) {
         String message = exception.getMessage() != null ?
             exception.getMessage() : "User not found";

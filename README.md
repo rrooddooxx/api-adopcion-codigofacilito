@@ -67,6 +67,13 @@ solicitudes de adopción.
 
 - `GET /actuator/health` - Información sobre la salud de la aplicación
 
+## Rutas de OpenAPI Swagger
+
+- `/swagger-ui/index.html` - Página de documentación de la API con Swagger UI
+- `/v3/api-docs` - Documentación de la API en formato JSON
+
+![swagger-ui.png](swagger-ui.png)
+
 ## 🚀 Ejecutar el Proyecto
 
 1. Clonar el repositorio
